@@ -1,0 +1,34 @@
+[
+  {
+    "title": "The future of technology",
+    "description": "Technology is rapidly evolving, and its impact on society continues to grow.",
+    "author": "John Doe",
+    "authorLink": "aurthor.html",
+    "date": "10.12.2012",
+    "image": "t1.jpeg"
+  },
+  {
+    "title": "My Journey into Web Development",
+    "description": "This blog shares my experience of starting web development as a computer engineering student, the challenges I faced, and how consistent practice helped me grow.",
+    "author": "Brad Frost",
+    "authorLink": "aurthor2.html",
+    "date": "10.12.2012",
+    "image": "t2.jpeg"
+  },
+  {
+    "title": "How APIs Work in Web Applications",
+    "description": "APIs allow frontend and backend systems to communicate. This post explains API concepts, request methods, and real-world use cases with simple examples.",
+    "author": "Addy Osmani",
+    "authorLink": "aurthor3.html",
+    "date": "10.12.2012",
+    "image": "t3.jpeg"
+  },
+  {
+    "title": "Understanding JavaScript Basics",
+    "description": "JavaScript is a powerful language used to make websites interactive. This post explains core JavaScript concepts such as variables, data types, and functions in a beginner-friendly way.",
+    "author": "Brendan Eich",
+    "authorLink": "aurthor4.html",
+    "date": "10.12.2012",
+    "image": "t4.jpeg"
+  }
+]
