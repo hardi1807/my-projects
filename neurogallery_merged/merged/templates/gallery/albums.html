@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Albums – NeuroGallery{% endblock %}
+{% block page_title %}Albums{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2><i class="fa-solid fa-book-open"></i> Albums</h2>
+  <a href="{% url 'create_album' %}" class="btn btn-primary">
+    <i class="fa-solid fa-plus"></i> New Album
+  </a>
+</div>
+
+<div class="album-grid">
+  {% for album in albums %}
+    <a href="{% url 'album_detail' album.id %}" class="album-card">
+      <div class="album-cover">
+        {% if album.cover_photo and album.cover_photo.thumbnail and album.cover_photo.thumbnail.name %}
+          <img src="{{ album.cover_photo.thumbnail.url }}" alt="{{ album.name }}"/>
+        {% elif album.cover_photo and album.cover_photo.image and album.cover_photo.image.name %}
+          <img src="{{ album.cover_photo.image.url }}" alt="{{ album.name }}"/>
+        {% else %}
+          <div class="album-cover-empty" style="aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+        {% endif %}
+      </div>
+      <div class="album-info">
+        <span class="album-name">{{ album.name }}</span>
+        <span class="album-count">{{ album.count }} photo{{ album.count|pluralize }}</span>
+        <span class="badge badge-{{ album.album_type }}">{{ album.album_type }}</span>
+        {% if album.is_public %}
+          <span class="badge" style="background:#d1fae5;color:#065f46;">Public</span>
+        {% endif %}
+      </div>
+    </a>
+  {% empty %}
+    <div class="empty-state">
+      <i class="fa-solid fa-book-open"></i>
+      <h3>No albums yet</h3>
+      <p>Create an album to organise your photos.</p>
+      <a href="{% url 'create_album' %}" class="btn btn-primary">Create Album</a>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

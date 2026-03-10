@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Delete Photo – NeuroGallery{% endblock %}
+{% block page_title %}Delete Photo{% endblock %}
+
+{% block content %}
+<div class="confirm-card">
+  <div class="confirm-icon danger">
+    <i class="fa-solid fa-trash-can"></i>
+  </div>
+  <h2>Delete this photo?</h2>
+  <p>This action cannot be undone. The photo and all its face data will be permanently removed.</p>
+
+  {% if photo.image and photo.image.name %}
+    <img src="{{ photo.image.url }}" alt="{{ photo.title }}" class="confirm-preview"/>
+  {% endif %}
+
+  {% if photo.title %}
+    <p style="font-weight:600;margin-bottom:16px;">{{ photo.title }}</p>
+  {% endif %}
+
+  <div class="confirm-actions">
+    <a href="{% url 'photo_detail' photo.id %}" class="btn btn-secondary">
+      <i class="fa-solid fa-arrow-left"></i> Cancel
+    </a>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">
+        <i class="fa-solid fa-trash"></i> Delete
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Profile – NeuroGallery{% endblock %}
+{% block page_title %}Profile{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+  <!-- Profile header -->
+  <div class="profile-header">
+    {% if profile.avatar and profile.avatar.name %}
+      <img src="{{ profile.avatar.url }}" alt="Avatar" class="profile-avatar"/>
+    {% else %}
+      <div class="profile-avatar profile-avatar-empty">
+        <i class="fa-solid fa-user"></i>
+      </div>
+    {% endif %}
+    <div>
+      <h2 style="font-size:1.3rem;">{{ user.get_full_name|default:user.username }}</h2>
+      <p class="muted">@{{ user.username }} · {{ user.email }}</p>
+      {% if profile.bio %}
+        <p style="margin-top:8px;font-size:.9rem;">{{ profile.bio }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Edit form -->
+  <div class="form-card">
+    <h3><i class="fa-solid fa-user-gear"></i> Edit Profile</h3>
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label style="font-size:.88rem;font-weight:600;display:block;margin-bottom:5px;">Profile Photo</label>
+        {{ form.avatar }}
+        {% if form.avatar.errors %}<span class="field-error">{{ form.avatar.errors.0 }}</span>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label style="font-size:.88rem;font-weight:600;display:block;margin-bottom:5px;">Bio</label>
+        {{ form.bio }}
+      </div>
+
+      <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+        {{ form.dark_mode }}
+        <label style="font-size:.9rem;font-weight:600;margin:0;">Enable Dark Mode</label>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+          <i class="fa-solid fa-floppy-disk"></i> Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

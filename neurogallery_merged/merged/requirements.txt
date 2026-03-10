@@ -1,0 +1,12 @@
+# NeuroGallery – Python Requirements (JSON Storage Edition)
+# Install: pip install -r requirements.txt
+# No MySQL required — all app data stored in JSON files.
+
+Django
+Pillow
+opencv-python
+scikit-learn
+numpy
+scipy
+ImageHash
+python-decouple

@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard – NeuroGallery{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fa-solid fa-images"></i></div>
+    <div class="stat-info">
+      <span class="stat-number">{{ stats.total_photos }}</span>
+      <span class="stat-label">Total Photos</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)"><i class="fa-solid fa-book-open"></i></div>
+    <div class="stat-info">
+      <span class="stat-number">{{ stats.total_albums }}</span>
+      <span class="stat-label">Albums</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:linear-gradient(135deg,#10b981,#34d399)"><i class="fa-solid fa-people-group"></i></div>
+    <div class="stat-info">
+      <span class="stat-number">{{ stats.total_people }}</span>
+      <span class="stat-label">People</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:linear-gradient(135deg,#ec4899,#f472b6)"><i class="fa-solid fa-camera"></i></div>
+    <div class="stat-info">
+      <span class="stat-number">{{ stats.selfies }}</span>
+      <span class="stat-label">Selfies</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:linear-gradient(135deg,#3b82f6,#60a5fa)"><i class="fa-solid fa-users"></i></div>
+    <div class="stat-info">
+      <span class="stat-number">{{ stats.group_photos }}</span>
+      <span class="stat-label">Group Photos</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:linear-gradient(135deg,#fbbf24,#fcd34d)"><i class="fa-solid fa-star"></i></div>
+    <div class="stat-info">
+      <span class="stat-number">{{ stats.favourites }}</span>
+      <span class="stat-label">Favourites</span>
+    </div>
+  </div>
+</div>
+
+<!-- Quick upload -->
+<div class="dashboard-quick-upload">
+  <a href="{% url 'upload' %}" class="btn btn-primary btn-lg">
+    <i class="fa-solid fa-cloud-arrow-up"></i> Upload Photos
+  </a>
+  <a href="{% url 'gallery' %}" class="btn btn-secondary btn-lg">
+    <i class="fa-solid fa-images"></i> View Gallery
+  </a>
+  <a href="{% url 'create_album' %}" class="btn btn-secondary btn-lg">
+    <i class="fa-solid fa-plus"></i> New Album
+  </a>
+</div>
+
+<!-- Recent Photos -->
+<div class="dashboard-section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-clock-rotate-left"></i> Recent Photos</h2>
+    <a href="{% url 'gallery' %}">View all →</a>
+  </div>
+  <div class="photo-grid">
+    {% for photo in recent_photos %}
+      <a href="{% url 'photo_detail' photo.id %}" class="photo-card">
+        {% if photo.thumbnail and photo.thumbnail.name %}
+          <img src="{{ photo.thumbnail.url }}" alt="{{ photo.title }}" loading="lazy"/>
+        {% elif photo.image and photo.image.name %}
+          <img src="{{ photo.image.url }}" alt="{{ photo.title }}" loading="lazy"/>
+        {% else %}
+          <div style="width:100%;height:100%;background:var(--border);display:flex;align-items:center;justify-content:center;">
+            <i class="fa-solid fa-image" style="font-size:2rem;color:var(--text-muted);"></i>
+          </div>
+        {% endif %}
+        <div class="photo-overlay">
+          <span class="photo-date">{{ photo.upload_date|slice:":10" }}</span>
+          {% if photo.is_favourite %}<span class="fav-badge"><i class="fa-solid fa-star"></i></span>{% endif %}
+          {% if photo.face_count > 0 %}<span class="face-badge"><i class="fa-solid fa-user"></i> {{ photo.face_count }}</span>{% endif %}
+        </div>
+      </a>
+    {% empty %}
+      <div class="empty-state">
+        <i class="fa-solid fa-images"></i>
+        <h3>No photos yet</h3>
+        <p>Upload your first photos to get started.</p>
+        <a href="{% url 'upload' %}" class="btn btn-primary">Upload Now</a>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Recent Albums -->
+{% if recent_albums %}
+<div class="dashboard-section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-book-open"></i> Recent Albums</h2>
+    <a href="{% url 'albums' %}">View all →</a>
+  </div>
+  <div class="album-grid">
+    {% for album in recent_albums %}
+      <a href="{% url 'album_detail' album.id %}" class="album-card">
+        <div class="album-cover">
+          {% if album.cover_photo and album.cover_photo.thumbnail %}
+            <img src="{{ album.cover_photo.thumbnail.url }}" alt="{{ album.name }}"/>
+          {% else %}
+            <div class="album-cover-empty" style="aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;">
+              <i class="fa-solid fa-book-open"></i>
+            </div>
+          {% endif %}
+        </div>
+        <div class="album-info">
+          <span class="album-name">{{ album.name }}</span>
+          <span class="album-count">{{ album.count }} photo{{ album.count|pluralize }}</span>
+          <span class="badge badge-{{ album.album_type }}">{{ album.album_type }}</span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Top People -->
+{% if top_people %}
+<div class="dashboard-section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-people-group"></i> People</h2>
+    <a href="{% url 'people' %}">View all →</a>
+  </div>
+  <div class="people-row">
+    {% for person in top_people %}
+      <a href="{% url 'person_detail' person.id %}" class="person-bubble">
+        {% if person.thumbnail and person.thumbnail.name %}
+          <img src="{{ person.thumbnail.url }}" alt="{{ person.name }}"/>
+        {% else %}
+          <div class="person-avatar"><i class="fa-solid fa-user"></i></div>
+        {% endif %}
+        <span>{{ person.name }}</span>
+        <small>{{ person.photo_count }} photo{{ person.photo_count|pluralize }}</small>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

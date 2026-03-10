@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}{{ album.name }} – NeuroGallery{% endblock %}
+{% block page_title %}Album{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h2><i class="fa-solid fa-book-open"></i> {{ album.name }}</h2>
+    <p class="muted">
+      {{ photos|length }} photo{{ photos|length|pluralize }}
+      · <span class="badge badge-{{ album.album_type }}">{{ album.album_type }}</span>
+      {% if album.is_public %}<span class="badge" style="background:#d1fae5;color:#065f46;margin-left:4px;">Public</span>{% endif %}
+    </p>
+    {% if album.description %}
+      <p style="margin-top:6px;font-size:.9rem;color:var(--text-muted);">{{ album.description }}</p>
+    {% endif %}
+  </div>
+  <a href="{% url 'albums' %}" class="btn btn-secondary btn-sm">
+    <i class="fa-solid fa-arrow-left"></i> All Albums
+  </a>
+</div>
+
+<div class="photo-grid">
+  {% for photo in photos %}
+    <a href="{% url 'photo_detail' photo.id %}" class="photo-card">
+      {% if photo.thumbnail and photo.thumbnail.name %}
+        <img src="{{ photo.thumbnail.url }}" alt="{{ photo.title }}" loading="lazy"/>
+      {% elif photo.image and photo.image.name %}
+        <img src="{{ photo.image.url }}" alt="{{ photo.title }}" loading="lazy"/>
+      {% else %}
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--border);">
+          <i class="fa-solid fa-image" style="font-size:2rem;color:var(--text-muted);"></i>
+        </div>
+      {% endif %}
+      <div class="photo-overlay">
+        <span class="photo-date">{{ photo.upload_date|slice:":10" }}</span>
+        {% if photo.is_favourite %}<span class="fav-badge"><i class="fa-solid fa-star"></i></span>{% endif %}
+      </div>
+    </a>
+  {% empty %}
+    <div class="empty-state">
+      <i class="fa-solid fa-images"></i>
+      <h3>This album is empty</h3>
+      <p>Add photos to this album from the gallery.</p>
+      <a href="{% url 'gallery' %}" class="btn btn-primary">Go to Gallery</a>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

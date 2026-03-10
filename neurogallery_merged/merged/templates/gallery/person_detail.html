@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}{{ person.name }} – NeuroGallery{% endblock %}
+{% block page_title %}Person Detail{% endblock %}
+
+{% block content %}
+<div class="person-detail-header">
+  {% if person.thumbnail and person.thumbnail.name %}
+    <img src="{{ person.thumbnail.url }}" alt="{{ person.name }}" class="person-detail-avatar"/>
+  {% else %}
+    <div class="person-detail-avatar" style="background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--text-muted);">
+      <i class="fa-solid fa-user"></i>
+    </div>
+  {% endif %}
+  <div>
+    <h2 style="font-size:1.4rem;">{{ person.name }}</h2>
+    <p class="muted">{{ person.photo_count }} photo{{ person.photo_count|pluralize }} · Cluster #{{ person.cluster_id }}</p>
+
+    <!-- Rename form -->
+    <form method="post" class="rename-form">
+      {% csrf_token %}
+      <input type="text" name="name" value="{{ person.name }}" class="form-control-sm form-control" placeholder="Enter name"/>
+      <button type="submit" class="btn btn-primary btn-sm">
+        <i class="fa-solid fa-pen"></i> Rename
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="page-header">
+  <h2><i class="fa-solid fa-images"></i> Photos</h2>
+  <a href="{% url 'people' %}" class="btn btn-secondary btn-sm">
+    <i class="fa-solid fa-arrow-left"></i> All People
+  </a>
+</div>
+
+<div class="photo-grid">
+  {% for photo in photos %}
+    <a href="{% url 'photo_detail' photo.id %}" class="photo-card">
+      {% if photo.thumbnail and photo.thumbnail.name %}
+        <img src="{{ photo.thumbnail.url }}" alt="{{ photo.title }}" loading="lazy"/>
+      {% elif photo.image and photo.image.name %}
+        <img src="{{ photo.image.url }}" alt="{{ photo.title }}" loading="lazy"/>
+      {% else %}
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--border);">
+          <i class="fa-solid fa-image" style="font-size:2rem;color:var(--text-muted);"></i>
+        </div>
+      {% endif %}
+      <div class="photo-overlay">
+        <span class="photo-date">{{ photo.upload_date|slice:":10" }}</span>
+      </div>
+    </a>
+  {% empty %}
+    <div class="empty-state">
+      <i class="fa-solid fa-images"></i>
+      <h3>No photos linked</h3>
+      <p>Re-run clustering to assign photos to this person.</p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

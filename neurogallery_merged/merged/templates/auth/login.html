@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Login – NeuroGallery{% endblock %}
+{% block content %}
+<div class="auth-card">
+  <div class="auth-logo">
+    <i class="fa-solid fa-brain"></i>
+    <h1>NeuroGallery</h1>
+    <p>Sign in to your account</p>
+  </div>
+
+  {% if messages %}
+    {% for msg in messages %}
+      <div class="alert alert-{{ msg.tags }}">
+        <i class="fa-solid fa-circle-info"></i> {{ msg }}
+        <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" style="display:block;font-size:.88rem;font-weight:600;margin-bottom:5px;">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <span class="field-error">{{ field.errors.0 }}</span>
+        {% endif %}
+      </div>
+    {% endfor %}
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger" style="margin-bottom:12px;">
+        <i class="fa-solid fa-triangle-exclamation"></i> {{ form.non_field_errors.0 }}
+      </div>
+    {% endif %}
+    <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top:10px;">
+      <i class="fa-solid fa-right-to-bracket"></i> Sign In
+    </button>
+  </form>
+
+  <p class="auth-footer">
+    Don't have an account? <a href="{% url 'register' %}">Register here</a>
+  </p>
+</div>
+{% endblock %}

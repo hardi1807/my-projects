@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" id="html-root">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}NeuroGallery{% endblock %}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<!-- ── Sidebar ─────────────────────────────────────────────────────────────── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <i class="fa-solid fa-brain"></i>
+    <span>NeuroGallery</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+      <i class="fa-solid fa-house"></i><span>Dashboard</span>
+    </a>
+    <a href="{% url 'gallery' %}" class="nav-item {% if request.resolver_match.url_name == 'gallery' %}active{% endif %}">
+      <i class="fa-solid fa-images"></i><span>Gallery</span>
+    </a>
+    <a href="{% url 'upload' %}" class="nav-item {% if request.resolver_match.url_name == 'upload' %}active{% endif %}">
+      <i class="fa-solid fa-cloud-arrow-up"></i><span>Upload</span>
+    </a>
+    <a href="{% url 'people' %}" class="nav-item {% if request.resolver_match.url_name == 'people' or request.resolver_match.url_name == 'person_detail' %}active{% endif %}">
+      <i class="fa-solid fa-people-group"></i><span>People</span>
+    </a>
+    <a href="{% url 'albums' %}" class="nav-item {% if 'album' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fa-solid fa-book-open"></i><span>Albums</span>
+    </a>
+    <a href="{% url 'search' %}" class="nav-item {% if request.resolver_match.url_name == 'search' %}active{% endif %}">
+      <i class="fa-solid fa-magnifying-glass"></i><span>Search</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="{% url 'profile' %}" class="nav-item">
+      <i class="fa-solid fa-user-gear"></i><span>Profile</span>
+    </a>
+    <button class="nav-item btn-dark-toggle" id="darkToggle" title="Toggle dark mode">
+      <i class="fa-solid fa-circle-half-stroke"></i><span>Dark Mode</span>
+    </button>
+    <a href="{% url 'logout' %}" class="nav-item nav-logout">
+      <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
+    </a>
+  </div>
+</aside>
+
+<!-- ── Top bar ─────────────────────────────────────────────────────────────── -->
+<header class="topbar">
+  <button class="sidebar-toggle" id="sidebarToggle">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+  <div class="topbar-title">{% block page_title %}NeuroGallery{% endblock %}</div>
+  <div class="topbar-right">
+    <form action="{% url 'search' %}" method="get" class="topbar-search">
+      <input type="text" name="query" placeholder="Search photos…" class="search-input" value="{{ request.GET.query }}"/>
+      <button type="submit"><i class="fa-solid fa-search"></i></button>
+    </form>
+    <span class="topbar-user">
+      <i class="fa-solid fa-user-circle"></i> {{ user.username }}
+    </span>
+  </div>
+</header>
+{% endif %}
+
+<main class="{% if user.is_authenticated %}main-content{% else %}auth-page{% endif %}">
+  {% if user.is_authenticated and messages %}
+    <div class="messages-container">
+      {% for msg in messages %}
+        <div class="alert alert-{{ msg.tags }}">
+          <i class="fa-solid fa-circle-info"></i> {{ msg }}
+          <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</main>
+
+<script src="{% static 'js/app.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

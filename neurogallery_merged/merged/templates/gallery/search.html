@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Search – NeuroGallery{% endblock %}
+{% block page_title %}Search{% endblock %}
+
+{% block content %}
+<!-- Search panel -->
+<div class="search-panel">
+  <form method="get" novalidate>
+    <div class="search-fields">
+      <div class="form-group flex-grow" style="margin-bottom:0;">
+        <label style="font-size:.82rem;font-weight:600;display:block;margin-bottom:4px;">Keyword</label>
+        {{ form.query }}
+      </div>
+      <div class="form-group flex-grow" style="margin-bottom:0;">
+        <label style="font-size:.82rem;font-weight:600;display:block;margin-bottom:4px;">Tag</label>
+        {{ form.tag }}
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label style="font-size:.82rem;font-weight:600;display:block;margin-bottom:4px;">From</label>
+        {{ form.date_from }}
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label style="font-size:.82rem;font-weight:600;display:block;margin-bottom:4px;">To</label>
+        {{ form.date_to }}
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button type="submit" class="btn btn-primary">
+        <i class="fa-solid fa-magnifying-glass"></i> Search
+      </button>
+      <a href="{% url 'search' %}" class="btn btn-secondary">
+        <i class="fa-solid fa-xmark"></i> Clear
+      </a>
+    </div>
+  </form>
+</div>
+
+{% if query %}
+  <p class="search-results-header">
+    Results for <strong>"{{ query }}"</strong> — {{ page_obj.paginator.count }} photo{{ page_obj.paginator.count|pluralize }}
+  </p>
+{% endif %}
+
+<div class="photo-grid">
+  {% for photo in photos %}
+    <a href="{% url 'photo_detail' photo.id %}" class="photo-card">
+      {% if photo.thumbnail and photo.thumbnail.name %}
+        <img src="{{ photo.thumbnail.url }}" alt="{{ photo.title }}" loading="lazy"/>
+      {% elif photo.image and photo.image.name %}
+        <img src="{{ photo.image.url }}" alt="{{ photo.title }}" loading="lazy"/>
+      {% else %}
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--border);">
+          <i class="fa-solid fa-image" style="font-size:2rem;color:var(--text-muted);"></i>
+        </div>
+      {% endif %}
+      <div class="photo-overlay">
+        <span class="photo-date">{{ photo.upload_date|slice:":10" }}</span>
+        {% if photo.is_favourite %}<span class="fav-badge"><i class="fa-solid fa-star"></i></span>{% endif %}
+      </div>
+    </a>
+  {% empty %}
+    <div class="empty-state">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <h3>No photos found</h3>
+      <p>Try different keywords, tags, or date ranges.</p>
+    </div>
+  {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+  {% if page_obj.has_previous %}
+    <a href="?{% if query %}query={{ query }}&{% endif %}page={{ page_obj.previous_page_number }}" class="page-btn">
+      <i class="fa-solid fa-chevron-left"></i> Prev
+    </a>
+  {% endif %}
+  <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+    <a href="?{% if query %}query={{ query }}&{% endif %}page={{ page_obj.next_page_number }}" class="page-btn">
+      Next <i class="fa-solid fa-chevron-right"></i>
+    </a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

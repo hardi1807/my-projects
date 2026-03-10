@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}People – NeuroGallery{% endblock %}
+{% block page_title %}People{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h2><i class="fa-solid fa-people-group"></i> People</h2>
+    <p class="muted">Faces detected and clustered by AI</p>
+  </div>
+  <a href="{% url 'run_clustering' %}" class="btn btn-secondary"
+     onclick="return confirm('Re-run face detection on all photos? This may take a while.')">
+    <i class="fa-solid fa-rotate"></i> Re-run Clustering
+  </a>
+</div>
+
+<div class="people-grid">
+  {% for person in people %}
+    <a href="{% url 'person_detail' person.id %}" class="person-card">
+      <div class="person-face person-face-empty" style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;">
+        {% if person.thumbnail and person.thumbnail.name %}
+          <img class="person-face" src="{{ person.thumbnail.url }}" alt="{{ person.name }}"/>
+        {% else %}
+          <i class="fa-solid fa-user"></i>
+        {% endif %}
+      </div>
+      <div class="person-card-info">
+        <span class="person-name">{{ person.name }}</span>
+        <span class="person-photos">{{ person.photo_count }} photo{{ person.photo_count|pluralize }}</span>
+      </div>
+    </a>
+  {% empty %}
+    <div class="empty-state">
+      <i class="fa-solid fa-people-group"></i>
+      <h3>No people found yet</h3>
+      <p>Upload photos with faces, then run AI clustering to detect people.</p>
+      <a href="{% url 'upload' %}" class="btn btn-primary">Upload Photos</a>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

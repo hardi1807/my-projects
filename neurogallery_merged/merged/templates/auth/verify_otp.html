@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Verify Email – NeuroGallery{% endblock %}
+{% block content %}
+<div class="auth-card" style="text-align:center;">
+  <div class="auth-logo">
+    <i class="fa-solid fa-shield-halved"></i>
+    <h1>Verify Your Email</h1>
+    <p>We sent a 6-digit OTP to <strong>{{ email }}</strong></p>
+  </div>
+
+  {% if messages %}
+    {% for msg in messages %}
+      <div class="alert alert-{{ msg.tags }}" style="text-align:left;">
+        <i class="fa-solid fa-circle-info"></i> {{ msg }}
+        <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="form-group">
+      <label style="display:block;font-size:.88rem;font-weight:600;margin-bottom:5px;text-align:left;">{{ form.otp.label }}</label>
+      {{ form.otp }}
+      {% if form.otp.errors %}
+        <span class="field-error">{{ form.otp.errors.0 }}</span>
+      {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top:10px;">
+      <i class="fa-solid fa-check-circle"></i> Verify & Continue
+    </button>
+  </form>
+
+  <form method="post" style="margin-top:14px;">
+    {% csrf_token %}
+    <button type="submit" name="resend" class="btn btn-secondary btn-block">
+      <i class="fa-solid fa-rotate-right"></i> Resend OTP
+    </button>
+  </form>
+
+  <p class="auth-footer">
+    <a href="{% url 'register' %}">← Back to Register</a>
+  </p>
+</div>
+{% endblock %}

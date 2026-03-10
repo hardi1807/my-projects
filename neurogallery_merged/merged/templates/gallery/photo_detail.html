@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block title %}{{ photo.title|default:"Photo" }} – NeuroGallery{% endblock %}
+{% block page_title %}Photo Detail{% endblock %}
+
+{% block content %}
+<div class="photo-viewer">
+  <!-- Image + navigation -->
+  <div class="viewer-nav">
+    {% if prev_id %}
+      <a href="{% url 'photo_detail' prev_id %}" class="nav-arrow nav-prev">
+        <i class="fa-solid fa-chevron-left"></i>
+      </a>
+    {% endif %}
+    <div class="viewer-main">
+      {% if photo.image and photo.image.name %}
+        <img id="viewer-img" src="{{ photo.image.url }}" alt="{{ photo.title }}"/>
+      {% else %}
+        <div style="color:#fff;font-size:3rem;"><i class="fa-solid fa-image"></i></div>
+      {% endif %}
+    </div>
+    {% if next_id %}
+      <a href="{% url 'photo_detail' next_id %}" class="nav-arrow nav-next">
+        <i class="fa-solid fa-chevron-right"></i>
+      </a>
+    {% endif %}
+  </div>
+
+  <!-- Info panel -->
+  <div class="viewer-info">
+    <div class="viewer-header">
+      <h2>{{ photo.title|default:"Untitled" }}</h2>
+      <div class="viewer-actions">
+        <button class="btn-icon {% if photo.is_favourite %}active{% endif %}" id="fav-btn"
+                data-pk="{{ photo.id }}" title="Favourite">
+          <i class="fa-{% if photo.is_favourite %}solid{% else %}regular{% endif %} fa-star"></i>
+        </button>
+        <a href="{% url 'delete_photo' photo.id %}" class="btn-icon btn-danger" title="Delete">
+          <i class="fa-solid fa-trash"></i>
+        </a>
+      </div>
+    </div>
+
+    {% if photo.description %}
+      <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:14px;">{{ photo.description }}</p>
+    {% endif %}
+
+    <table class="info-table">
+      <tr>
+        <td><i class="fa-regular fa-calendar"></i> Uploaded</td>
+        <td>{{ photo.upload_date|slice:":10" }}</td>
+      </tr>
+      {% if photo.taken_date %}
+      <tr>
+        <td><i class="fa-solid fa-camera"></i> Taken</td>
+        <td>{{ photo.taken_date }}</td>
+      </tr>
+      {% endif %}
+      <tr>
+        <td><i class="fa-solid fa-tag"></i> Category</td>
+        <td>{{ photo.get_category_display|default:photo.category }}</td>
+      </tr>
+      {% if photo.width and photo.height %}
+      <tr>
+        <td><i class="fa-solid fa-expand"></i> Size</td>
+        <td>{{ photo.width }}×{{ photo.height }}</td>
+      </tr>
+      {% endif %}
+      {% if photo.file_size %}
+      <tr>
+        <td><i class="fa-solid fa-weight-hanging"></i> File</td>
+        <td>{{ photo.file_size|filesizeformat }}</td>
+      </tr>
+      {% endif %}
+      <tr>
+        <td><i class="fa-solid fa-person"></i> Faces</td>
+        <td>{{ photo.face_count }}</td>
+      </tr>
+    </table>
+
+    <!-- Tags -->
+    {% with tag_list=photo.tags.all %}
+      {% if tag_list %}
+        <div class="tag-list">
+          {% for tag in tag_list %}
+            <a href="{% url 'search' %}?tag={{ tag.name }}" class="tag-pill">#{{ tag.name }}</a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Faces -->
+    {% if faces %}
+      <div class="face-section">
+        <h4><i class="fa-solid fa-users"></i> Detected Faces</h4>
+        <div class="face-row">
+          {% for face in faces %}
+            <div class="face-chip">
+              {% if face.face_image and face.face_image.name %}
+                <img src="{{ face.face_image.url }}" alt="face"/>
+              {% else %}
+                <div class="face-placeholder"><i class="fa-solid fa-user"></i></div>
+              {% endif %}
+              {% if face.person %}
+                <a href="{% url 'person_detail' face.person.id %}">{{ face.person.name }}</a>
+              {% else %}
+                <span style="color:var(--text-muted)">Unknown</span>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="ai-status">
+      {% if photo.ai_processed %}
+        <i class="fa-solid fa-circle-check" style="color:var(--success);"></i> AI processed
+      {% else %}
+        <i class="fa-solid fa-clock" style="color:var(--warning);"></i> AI processing pending
+      {% endif %}
+    </div>
+
+    <div style="margin-top:18px;">
+      <a href="{% url 'gallery' %}" class="btn btn-secondary btn-sm">
+        <i class="fa-solid fa-arrow-left"></i> Back to Gallery
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('fav-btn')?.addEventListener('click', function() {
+  const btn = this;
+  fetch("{% url 'toggle_favourite' photo.id %}", {
+    method: 'POST',
+    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+  })
+  .then(r => r.json())
+  .then(data => {
+    const icon = btn.querySelector('i');
+    if (data.is_favourite) {
+      btn.classList.add('active');
+      icon.className = 'fa-solid fa-star';
+    } else {
+      btn.classList.remove('active');
+      icon.className = 'fa-regular fa-star';
+    }
+  });
+});
+</script>
+{% endblock %}

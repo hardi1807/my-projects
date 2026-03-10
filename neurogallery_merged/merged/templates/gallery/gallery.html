@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Gallery – NeuroGallery{% endblock %}
+{% block page_title %}Gallery{% endblock %}
+
+{% block content %}
+<div class="gallery-toolbar">
+  <div class="page-header" style="margin-bottom:0;">
+    <h2><i class="fa-solid fa-images"></i> All Photos</h2>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <span class="photo-count">{{ page_obj.paginator.count }} photo{{ page_obj.paginator.count|pluralize }}</span>
+    <a href="{% url 'upload' %}" class="btn btn-primary btn-sm">
+      <i class="fa-solid fa-plus"></i> Upload
+    </a>
+  </div>
+</div>
+
+<div class="photo-grid">
+  {% for photo in photos %}
+    <a href="{% url 'photo_detail' photo.id %}" class="photo-card">
+      {% if photo.thumbnail and photo.thumbnail.name %}
+        <img src="{{ photo.thumbnail.url }}" alt="{{ photo.title }}" loading="lazy"/>
+      {% elif photo.image and photo.image.name %}
+        <img src="{{ photo.image.url }}" alt="{{ photo.title }}" loading="lazy"/>
+      {% else %}
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--border);">
+          <i class="fa-solid fa-image" style="font-size:2rem;color:var(--text-muted);"></i>
+        </div>
+      {% endif %}
+      <div class="photo-overlay">
+        <span class="photo-date">{{ photo.upload_date|slice:":10" }}</span>
+        <div style="display:flex;gap:4px;">
+          {% if photo.is_favourite %}<span class="fav-badge"><i class="fa-solid fa-star"></i></span>{% endif %}
+          {% if photo.face_count > 0 %}<span class="face-badge"><i class="fa-solid fa-user"></i> {{ photo.face_count }}</span>{% endif %}
+        </div>
+      </div>
+    </a>
+  {% empty %}
+    <div class="empty-state">
+      <i class="fa-solid fa-images"></i>
+      <h3>No photos yet</h3>
+      <p>Upload your first photos to fill your gallery.</p>
+      <a href="{% url 'upload' %}" class="btn btn-primary">Upload Now</a>
+    </div>
+  {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+  {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}" class="page-btn">
+      <i class="fa-solid fa-chevron-left"></i> Prev
+    </a>
+  {% endif %}
+  <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}" class="page-btn">
+      Next <i class="fa-solid fa-chevron-right"></i>
+    </a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}
